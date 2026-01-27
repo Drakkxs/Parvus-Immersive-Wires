@@ -1,0 +1,9 @@
+
+dependencies {
+    // --- Dev extras ---
+    localRuntime "curse.maven:jei-238222:7420587"
+    localRuntime "curse.maven:jade-324717:7428884"
+    localRuntime "curse.maven:modernfix-790626:7509726"
+    localRuntime "curse.maven:configured-457570:7276577"
+    localRuntime "curse.maven:ferritecore-429235:7524151"
+}
