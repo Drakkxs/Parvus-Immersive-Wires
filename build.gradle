@@ -172,6 +172,16 @@ dependencies {
     implementation 'curse.maven:integrated-dynamics-236307:6001774'
     implementation 'curse.maven:cyclops-core-232758:5979361'
     implementation 'curse.maven:common-capabilities-247007:5992581'
+
+    // Modern Industrialisation (NeoForge 1.21.1)
+    implementation 'curse.maven:modern-industrialization-405388:5806415'
+
+    // Cloth Config (NeoForge 1.21.1)
+    implementation 'curse.maven:cloth-config-348521:5729127'
+
+	// Super Factory Manager (NeoForge 1.21.1)
+    implementation "curse.maven:super-factory-manager-306935:7254808"
+	
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
