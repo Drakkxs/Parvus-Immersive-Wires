@@ -10,3 +10,5 @@ codes
 run
 old_stuff
 runs
+.idea/
+*.iml
