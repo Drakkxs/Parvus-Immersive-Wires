@@ -174,7 +174,7 @@ dependencies {
     implementation 'curse.maven:common-capabilities-247007:5992581'
 
     // Modern Industrialisation (NeoForge 1.21.1)
-    implementation 'curse.maven:modern-industrialization-405388:5806415'
+    implementation 'curse.maven:modern-industrialization-405388:7309662'
 
     // Cloth Config (NeoForge 1.21.1)
     implementation 'curse.maven:cloth-config-348521:5729127'
@@ -236,5 +236,3 @@ idea {
         downloadJavadoc = true
     }
 }
-
-apply from: "dev-deps.gradle"
