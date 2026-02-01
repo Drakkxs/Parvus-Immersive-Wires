@@ -4,61 +4,26 @@ import blusunrize.immersiveengineering.api.wires.*;
 import com.google.common.collect.ImmutableList;
 import com.parvus.morewires.MoreImmersiveWires;
 import com.parvus.morewires.tile.IOnCable.IOnCableConnector;
-import com.refinedmods.refinedstorage.api.network.impl.node.SimpleNetworkNode;
-import com.refinedmods.refinedstorage.common.api.RefinedStorageApi;
-import com.refinedmods.refinedstorage.common.api.support.network.ConnectionSink;
-import com.refinedmods.refinedstorage.common.api.support.network.InWorldNetworkNodeContainer;
-import com.refinedmods.refinedstorage.common.support.network.AbstractBaseNetworkNodeContainerBlockEntity;
-import com.refinedmods.refinedstorage.common.support.network.ColoredConnectionStrategy;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Collection;
 
-public class SFMConnectorBlockEntity extends AbstractBaseNetworkNodeContainerBlockEntity<SimpleNetworkNode> implements IOnCableConnector {
+public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConnector {
 	protected GlobalWireNetwork globalNet;
 
-	protected SFMConnectorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-		super(type, pos, state, new SimpleNetworkNode(0));
+	public SFMConnectorBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState blockState) {
+		super(blockEntityType, pos, blockState);
 	}
 
 	@Override
-	protected InWorldNetworkNodeContainer createMainContainer(final SimpleNetworkNode networkNode) {
-		return RefinedStorageApi.INSTANCE.createNetworkNodeContainer(this, networkNode)
-				.connectionStrategy(new ColoredConnectionStrategy(this::getBlockState,
-						this.getBlockPos()) {
-
-					@Override
-					public void addOutgoingConnections(ConnectionSink sink) {
-						Direction direction = getFacing();
-						sink.tryConnectInSameDimension(this.origin.relative(direction), direction.getOpposite());
-						LocalWireNetwork local = globalNet.getNullableLocalNet(new ConnectionPoint(worldPosition, 0));
-						if (local != null) {
-							SFMNetworkHandler net = local.getHandler(MoreImmersiveWires.RS_WIRE.simple().NET_ID, SFMNetworkHandler.class);
-							if (net != null)
-								net.addConnections(sink);
-						}
-					}
-
-					@Override
-					public boolean canAcceptIncomingConnection(Direction incomingDirection,
-							BlockState connectingState) {
-						return incomingDirection == getFacing();
-					}
-				})
-				.build();
-	}
-
-	@Override
-	public BlockState getState() {
-		return getBlockState();
+	public void setLevel(Level worldIn) {
+		globalNet = GlobalWireNetwork.getNetwork(worldIn);
 	}
 
 	@Override
@@ -67,22 +32,22 @@ public class SFMConnectorBlockEntity extends AbstractBaseNetworkNodeContainerBlo
 	}
 
 	@Override
+	public void connectCable(WireType cableType, ConnectionPoint target, IImmersiveConnectable other,
+							 ConnectionPoint otherTarget) {
+
+	}
+
+	@Override
+	public void removeCable(Connection connection, ConnectionPoint attachedPoint) {
+	}
+
+	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset) {
 		LocalWireNetwork local = this.globalNet.getNullableLocalNet(new ConnectionPoint(this.worldPosition, 0));
 		if (local != null && !local.getConnections(this.worldPosition).isEmpty()) {
 			return false;
 		}
-		return cableType == MoreImmersiveWires.RS_WIRE.simple().wireType;
-	}
-
-	@Override
-	public void connectCable(WireType cableType, ConnectionPoint target, IImmersiveConnectable other,
-			ConnectionPoint otherTarget) {
-	}
-
-	@Override
-	public void removeCable(Connection connection, ConnectionPoint attachedPoint) {
-		setChanged();
+		return cableType == MoreImmersiveWires.SFM_WIRE.simple().wireType;
 	}
 
 	@Override
@@ -91,14 +56,13 @@ public class SFMConnectorBlockEntity extends AbstractBaseNetworkNodeContainerBlo
 	}
 
 	@Override
-	public Level getLevelNonnull() {
-		return level;
+	public BlockState getState() {
+		return getBlockState();
 	}
 
 	@Override
-	public void setLevel(Level worldIn) {
-		super.setLevel(worldIn);
-		globalNet = GlobalWireNetwork.getNetwork(worldIn);
+	public Level getLevelNonnull() {
+		return level;
 	}
 
 	private boolean isUnloaded = false;
@@ -130,19 +94,6 @@ public class SFMConnectorBlockEntity extends AbstractBaseNetworkNodeContainerBlo
 
 	@Override
 	public Collection<ResourceLocation> getRequestedHandlers() {
-		return ImmutableList.of(MoreImmersiveWires.RS_WIRE.simple().NET_ID);
-	}
-
-	@Override
-	public Component getName() {
-		return MoreImmersiveWires.RS_WIRE.simple().CONNECTOR.get().getName();
-	}
-
-	public GlobalPos getGlobalPos() {
-		return new GlobalPos(level.dimension(), worldPosition);
-	}
-
-	public void networkChanged() {
-		this.containers.update(this.level);
+		return ImmutableList.of(MoreImmersiveWires.SFM_WIRE.simple().NET_ID);
 	}
 }
