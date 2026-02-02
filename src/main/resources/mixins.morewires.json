@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_21",
+  "package": "com.tom.morewires.compat.sfm.mixin",
+  "mixins": [
+    "SFMCableDiscovery",
+    "SFMAfterGetOrRegister"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

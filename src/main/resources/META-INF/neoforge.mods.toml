@@ -59,3 +59,6 @@ Add modded wire support for Immersive Engineering
     versionRange="*"
     ordering="NONE"
     side="BOTH"
+[[mixins]]
+config="mixins.morewires.json"
+
