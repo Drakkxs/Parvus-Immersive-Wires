@@ -7,7 +7,9 @@ import com.google.common.collect.ImmutableList;
 import com.tom.morewires.MoreImmersiveWires;
 import com.tom.morewires.tile.IOnCable.IOnCableConnector;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -98,6 +100,10 @@ public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConn
 		if (level != null && !level.isClientSide && globalNet != null) {
 			ConnectorBlockEntityHelper.remove(level, this);
 		}
+	}
+
+	public GlobalPos getGlobalPos() {
+		return new GlobalPos(level.dimension(), worldPosition);
 	}
 
 }

@@ -3,6 +3,7 @@ package com.tom.morewires.compat.sfm;
 import blusunrize.immersiveengineering.api.wires.GlobalWireNetwork;
 import blusunrize.immersiveengineering.api.wires.IImmersiveConnectable;
 import blusunrize.immersiveengineering.api.wires.LocalWireNetwork;
+import com.refinedmods.refinedstorage.common.api.support.network.ConnectionSink;
 import com.tom.morewires.network.SimpleNetworkHandler;
 
 public class SFMNetworkHandler extends SimpleNetworkHandler<SFMConnectorBlockEntity, SFMNetworkHandler> {
@@ -21,4 +22,5 @@ public class SFMNetworkHandler extends SimpleNetworkHandler<SFMConnectorBlockEnt
 		// SFM doesn't need network handler notification
 		// Network updates are handled by the mixin
 	}
+
 }

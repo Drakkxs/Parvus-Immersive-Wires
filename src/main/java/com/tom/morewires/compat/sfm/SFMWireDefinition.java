@@ -1,13 +1,18 @@
 package com.tom.morewires.compat.sfm;
 
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
+import com.tom.morewires.compat.rs.RSConnectorBlock;
+import com.tom.morewires.compat.rs.RSConnectorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.morewires.SimpleWireTypeDefinition;
 
 import blusunrize.immersiveengineering.api.wires.localhandlers.ILocalHandlerConstructor;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class SFMWireDefinition extends SimpleWireTypeDefinition<SFMConnectorBlockEntity> {
     public SFMWireDefinition() {
@@ -22,6 +27,11 @@ public class SFMWireDefinition extends SimpleWireTypeDefinition<SFMConnectorBloc
     @Override
     public SFMConnectorBlockEntity createBE(BlockPos pos, BlockState state) {
         return new SFMConnectorBlockEntity(pos, state);
+    }
+
+    @Override
+    public Block makeBlock(DeferredHolder<BlockEntityType<?>, BlockEntityType<SFMConnectorBlockEntity>> type) {
+        return new SFMConnectorBlock(type, this::isCable);
     }
 
     @Override
