@@ -24,7 +24,7 @@ public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConn
 
 	@Override
 	public boolean canConnect() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConn
 
 	@Override
 	public BlockPos getPosition() {
-		return null;
+		return worldPosition;
 	}
 
 	@Override
@@ -60,11 +60,37 @@ public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConn
 
 	@Override
 	public Level getLevelNonnull() {
-		return null;
+		return level;
 	}
 
 	@Override
 	public BlockState getState() {
-		return null;
+		return getBlockState();
 	}
+
+	@Override
+	public void onLoad() {
+		super.onLoad();
+		if (level != null && !level.isClientSide) {
+			globalNet = GlobalWireNetwork.getNetwork(level);
+			ConnectorBlockEntityHelper.onChunkLoad(this, level);
+		}
+	}
+
+	@Override
+	public void onChunkUnloaded() {
+		super.onChunkUnloaded();
+		if (globalNet != null) {
+			ConnectorBlockEntityHelper.onChunkUnload(globalNet, this);
+		}
+	}
+
+	@Override
+	public void setRemoved() {
+		super.setRemoved();
+		if (level != null && !level.isClientSide && globalNet != null) {
+			ConnectorBlockEntityHelper.remove(level, this);
+		}
+	}
+
 }
