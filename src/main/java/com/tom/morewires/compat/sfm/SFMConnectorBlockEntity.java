@@ -101,9 +101,4 @@ public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConn
 			ConnectorBlockEntityHelper.remove(level, this);
 		}
 	}
-
-	public GlobalPos getGlobalPos() {
-		return new GlobalPos(level.dimension(), worldPosition);
-	}
-
 }
