@@ -16,7 +16,7 @@ public class SFMWireDefinition extends SimpleWireTypeDefinition<SFMConnectorBloc
 
     @Override
     protected ILocalHandlerConstructor createLocalHandler() {
-        return null;
+        return SFMNetworkHandler::new;
     }
 
     @Override
