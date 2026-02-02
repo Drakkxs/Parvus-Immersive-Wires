@@ -43,13 +43,21 @@ public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConn
 	@Override
 	public void connectCable(WireType cableType, ConnectionPoint target, IImmersiveConnectable other, ConnectionPoint otherTarget) {
 		// Trigger SFM network refresh when wire connects
-		CableNetworkManager.onCablePlaced(level, worldPosition);
+		if (level != null) {
+			CableNetworkManager.onCablePlaced(level, worldPosition);
+			CableNetworkManager.getOrRegisterNetworkFromCablePosition(level, worldPosition).ifPresent(cableNetwork -> {
+				CableNetworkManager.getOrRegisterNetworkFromCablePosition(level, other.getPosition()).ifPresent(cableNetwork::mergeNetwork);
+			});
+		}
 	}
 
 	@Override
 	public void removeCable(Connection connection, ConnectionPoint attachedPoint) {
 		// Trigger SFM network refresh when wire disconnects
-		CableNetworkManager.onCableRemoved(level, worldPosition);
+		if (level != null) {
+			CableNetworkManager.onCableRemoved(level, worldPosition);
+			CableNetworkManager.onCableRemoved(level, attachedPoint.position());
+		}
 	}
 
 	@Override

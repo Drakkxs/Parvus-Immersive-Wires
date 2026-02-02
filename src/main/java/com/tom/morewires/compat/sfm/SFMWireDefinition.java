@@ -1,6 +1,8 @@
 package com.tom.morewires.compat.sfm;
 
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
+import ca.teamdman.sfm.common.registry.SFMCapabilities;
+import com.refinedmods.refinedstorage.neoforge.api.RefinedStorageNeoForgeApi;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -10,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import com.tom.morewires.SimpleWireTypeDefinition;
 
 import blusunrize.immersiveengineering.api.wires.localhandlers.ILocalHandlerConstructor;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class SFMWireDefinition extends SimpleWireTypeDefinition<SFMConnectorBlockEntity> {
@@ -37,5 +40,4 @@ public class SFMWireDefinition extends SimpleWireTypeDefinition<SFMConnectorBloc
         // Check if block is SFM cable
         return level.getBlockState(pos).getBlock() instanceof ICableBlock;
     }
-
 }

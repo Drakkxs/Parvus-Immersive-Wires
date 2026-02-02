@@ -15,5 +15,4 @@ public class SFMConnectorBlock extends OnCableConnectorBlock<SFMConnectorBlockEn
 							 BiPredicate<BlockGetter, BlockPos> isOnCable) {
 		super(type, isOnCable);
 	}
-
 }
