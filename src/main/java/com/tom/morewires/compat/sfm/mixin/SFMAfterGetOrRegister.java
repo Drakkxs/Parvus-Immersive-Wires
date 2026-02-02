@@ -2,6 +2,7 @@ package com.tom.morewires.compat.sfm.mixin;
 
 import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
+import com.tom.morewires.MoreImmersiveWires;
 import com.tom.morewires.compat.sfm.util.SFMIEAdjacency;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -82,7 +83,8 @@ public abstract class SFMAfterGetOrRegister {
             posMap.put(cur.asLong(), net);
 
             // Enqueue only valid cable neighbors (keeps BFS tight)
-            SFMIEAdjacency.forEachCableNeighbor(level, cur, neighbor -> {
+            SFMIEAdjacency.forEachNetworkNeighbor(level, cur, neighbor -> {
+                if (!SFMIEAdjacency.isTraversable(level, neighbor)) return;
                 long key = neighbor.asLong();
                 if (seen.add(key)) q.add(neighbor.immutable());
             });
@@ -91,5 +93,21 @@ public abstract class SFMAfterGetOrRegister {
         }
 
         net.getLevelCapabilityCache().clear();
+
+        int bad = 0;
+        for (var it = net.getCablePositionsRaw().iterator(); it.hasNext();) {
+            long p = it.nextLong();
+            BlockPos bp = BlockPos.of(p);
+            if (!CableNetwork.isCable(level, bp)) {
+                bad++;
+                if (bad > 0 && level.getGameTime() % 20 == 0) {
+                    MoreImmersiveWires.LOGGER.warn("[MIW:SFM] BAD CABLE POS in cablePositions: {}", bp);
+                }
+            }
+        }
+        MoreImmersiveWires.LOGGER.info("[MIW:SFM] cablePositions size={}, bad={}", net.getCableCount(), bad);
+
+        long capCount = net.getCapabilityProviderPositions().count();
+        MoreImmersiveWires.LOGGER.info("[MIW:SFM] capabilityProviderPositions={}", capCount);
     }
 }

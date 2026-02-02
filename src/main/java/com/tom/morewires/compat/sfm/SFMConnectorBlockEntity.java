@@ -1,10 +1,9 @@
 package com.tom.morewires.compat.sfm;
 
 import blusunrize.immersiveengineering.api.wires.*;
-import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
-import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import com.google.common.collect.ImmutableList;
 import com.tom.morewires.MoreImmersiveWires;
+import com.tom.morewires.compat.sfm.util.SFMTraversalScheduler;
 import com.tom.morewires.tile.IOnCable.IOnCableConnector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -28,55 +27,42 @@ public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConn
 	}
 
 	@Override
-	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset) {
-		if (level == null) return false;
+	public boolean canConnectCable(WireType wireType, ConnectionPoint target, Vec3i offset) {
+		if (level == null || level.isClientSide) return false;
 
-		// Only allow our wire type
-		if (cableType != MoreImmersiveWires.SFM_WIRE.simple().wireType) return false;
+		if (wireType != MoreImmersiveWires.SFM_WIRE.simple().wireType) return false;
 
-		// IMPORTANT: don't rely on cached globalNet during early load
-		GlobalWireNetwork net = this.globalNet;
-		if (net == null) net = GlobalWireNetwork.getNetwork(level);
-		if (net == null) return false;
+		GlobalWireNetwork net = GlobalWireNetwork.getNetwork(level);
+		if (net == null) return true; // allow, IE will finalize later
 
-		ConnectionPoint cp = new ConnectionPoint(this.worldPosition, 0);
-		LocalWireNetwork local = net.getNullableLocalNet(cp);
+		ConnectionPoint here = new ConnectionPoint(worldPosition, 0);
+		LocalWireNetwork local = net.getNullableLocalNet(here);
 
-		// Disallow if we already have any connection at this point
-		if (local != null && !local.getConnections(cp).isEmpty()) return false;
-
-		return true;
+		// If you want to allow multiple wires, return true here.
+		// If you want one connection only:
+		return local == null || local.getConnections(here).isEmpty();
 	}
 
 	@Override
 	public void connectCable(WireType cableType, ConnectionPoint target, IImmersiveConnectable other, ConnectionPoint otherTarget) {
 		if (level == null || level.isClientSide) return;
+		System.out.println("[MIW:SFM] connectCable fired at " + worldPosition);
+		SFMTraversalScheduler.markDirty(level, worldPosition);
+		SFMTraversalScheduler.markDirty(level, other.getPosition());
 
-		// Refresh topology only if this block is actually a cable in SFM terms
-		if (level.getBlockState(worldPosition).getBlock() instanceof ICableBlock) {
-			CableNetworkManager.onCablePlaced(level, worldPosition);
-		}
-
-		// Optional but harmless safety: refresh the other end too
-		BlockPos otherPos = other.getPosition();
-		if (level.getBlockState(otherPos).getBlock() instanceof ICableBlock) {
-			CableNetworkManager.onCablePlaced(level, otherPos);
-		}
 	}
 
 	@Override
 	public void removeCable(Connection connection, ConnectionPoint attachedPoint) {
 		if (level == null || level.isClientSide) return;
 
-		if (level.getBlockState(worldPosition).getBlock() instanceof ICableBlock) {
-			CableNetworkManager.onCableRemoved(level, worldPosition);
-		}
+		SFMTraversalScheduler.markDirty(level, worldPosition);
 
-		// Optional safety: call on the other endpoint as well
-		BlockPos otherPos = attachedPoint.position();
-		if (level.getBlockState(otherPos).getBlock() instanceof ICableBlock) {
-			CableNetworkManager.onCableRemoved(level, otherPos);
-		}
+		// the other side
+		ConnectionPoint other = connection.getEndA().position().equals(attachedPoint.position())
+				? connection.getEndB()
+				: connection.getEndA();
+		SFMTraversalScheduler.markDirty(level, other.position());
 	}
 
 	@Override

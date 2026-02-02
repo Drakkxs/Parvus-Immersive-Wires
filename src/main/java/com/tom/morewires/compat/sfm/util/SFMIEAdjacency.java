@@ -1,90 +1,81 @@
 package com.tom.morewires.compat.sfm.util;
 
-import blusunrize.immersiveengineering.api.wires.Connection;
-import blusunrize.immersiveengineering.api.wires.ConnectionPoint;
-import blusunrize.immersiveengineering.api.wires.GlobalWireNetwork;
-import blusunrize.immersiveengineering.api.wires.IImmersiveConnectable;
-import blusunrize.immersiveengineering.api.wires.LocalWireNetwork;
+import blusunrize.immersiveengineering.api.wires.*;
 import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import com.tom.morewires.MoreImmersiveWires;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-import java.util.ArrayDeque;
 import java.util.function.Consumer;
 
 public final class SFMIEAdjacency {
     private SFMIEAdjacency() {}
 
-    /**
-     * Emits "neighbor cable positions" by:
-     *  - 6-direction physical adjacency
-     *  - plus: any CableNetwork.isCable positions reachable by MoreImmersiveWires.SFM_WIRE through
-     *          IE connectors/relays (relay pass-through supported).
-     */
-    public static void forEachCableNeighbor(Level level, BlockPos current, Consumer<BlockPos> out) {
-        // 6 physical neighbors
-        BlockPos.MutableBlockPos tmp = new BlockPos.MutableBlockPos();
-        for (Direction d : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
-            tmp.set(current).move(d);
-            out.accept(tmp.immutable());
-        }
+    /** True if this position should be allowed as a BFS vertex (cable OR wire-node). */
+    public static boolean isTraversable(Level level, BlockPos pos) {
+        if (CableNetwork.isCable(level, pos)) return true;
+        return isWireNode(level, pos);
+    }
 
-        // Wire neighbors (relay-aware)
+    /** True if IE considers this position a connectable participating in our SFM wire type graph. */
+    public static boolean isWireNode(Level level, BlockPos pos) {
+        BlockEntity be = level.getBlockEntity(pos);
+        if (!(be instanceof IImmersiveConnectable connectable)) return false;
+
         GlobalWireNetwork global = GlobalWireNetwork.getNetwork(level);
-        if (global == null) return;
+        if (global == null) return false;
 
-        // Start only if THIS position is an IE connectable (connectors are; plain SFM cables usually aren't)
-        BlockEntity startBE = level.getBlockEntity(current);
-        if (!(startBE instanceof IImmersiveConnectable startConn)) return;
+        for (ConnectionPoint cp : connectable.getConnectionPoints()) {
+            LocalWireNetwork local = global.getNullableLocalNet(cp);
+            if (local == null) continue;
 
-        // Small BFS over IE connectables along ONLY our wire type,
-        // stopping when we hit CableNetwork.isCable blocks.
-        ArrayDeque<BlockPos> q = new ArrayDeque<>();
-        LongOpenHashSet seen = new LongOpenHashSet();
+            for (Connection conn : local.getConnections(cp)) {
+                if (conn.type != MoreImmersiveWires.SFM_WIRE.simple().wireType) continue;
+                return true;
+            }
+        }
+        return false;
+    }
 
-        q.add(current);
-        seen.add(current.asLong());
-
-        // Safety cap to avoid pathological graphs; adjust if you want
-        int expansionsLeft = 256;
-
-        while (!q.isEmpty() && expansionsLeft-- > 0) {
-            BlockPos at = q.removeFirst();
-
-            BlockEntity be = level.getBlockEntity(at);
-            if (!(be instanceof IImmersiveConnectable conn)) continue;
-
-            // Iterate all connection points (relays often have multiple)
-            for (ConnectionPoint cp : conn.getConnectionPoints()) {
-                LocalWireNetwork local = global.getNullableLocalNet(cp);
-                if (local == null) continue;
-
-                for (Connection c : local.getConnections(cp)) {
-                    if (c.type != MoreImmersiveWires.SFM_WIRE.simple().wireType) continue;
-
-                    ConnectionPoint otherCp = c.getEndA().equals(cp) ? c.getEndB() : c.getEndA();
-                    BlockPos otherPos = otherCp.position();
-                    if (otherPos.equals(current)) continue;
-
-                    // If the other end is a cable, emit it as a neighbor.
-                    // Otherwise, if it's a relay/connector (connectable), traverse through it.
-                    if (CableNetwork.isCable(level, otherPos)) {
-                        out.accept(otherPos.immutable());
-                    } else {
-                        // Only traverse through IE connectable
-                        BlockEntity otherBE = level.getBlockEntity(otherPos);
-                        if (otherBE instanceof IImmersiveConnectable) {
-                            long key = otherPos.asLong();
-                            if (seen.add(key)) q.add(otherPos);
-                        }
-                    }
+    /**
+     * Emits neighbors for traversal:
+     * - If current is an SFM cable: 6 physical neighbors (so SFM blocks still connect normally)
+     * - If current is an IE connectable: wire neighbors across SFM wire connections (connectors AND relays)
+     */
+    public static void forEachNetworkNeighbor(Level level, BlockPos current, Consumer<BlockPos> out) {
+        // Physical adjacency only matters for actual SFM cable blocks
+        if (CableNetwork.isCable(level, current)) {
+            BlockPos.MutableBlockPos tmp = new BlockPos.MutableBlockPos();
+            for (Direction d : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
+                tmp.set(current).move(d);
+                // Only traverse to another cable block (prevents "air vertices")
+                if (CableNetwork.isCable(level, tmp)) {
+                    out.accept(tmp.immutable());
                 }
             }
         }
+
+        // Wire adjacency: any IE connectable (connector OR relay)
+        BlockEntity be = level.getBlockEntity(current);
+        if (!(be instanceof IImmersiveConnectable connectable)) return;
+
+        GlobalWireNetwork global = GlobalWireNetwork.getNetwork(level);
+        if (global == null) return;
+
+        for (ConnectionPoint cp : connectable.getConnectionPoints()) {
+            LocalWireNetwork local = global.getNullableLocalNet(cp);
+            if (local == null) continue;
+
+            for (Connection conn : local.getConnections(cp)) {
+                if (conn.type != MoreImmersiveWires.SFM_WIRE.simple().wireType) continue;
+
+                ConnectionPoint other = conn.getEndA().equals(cp) ? conn.getEndB() : conn.getEndA();
+                out.accept(other.position());
+            }
+        }
+
     }
 }

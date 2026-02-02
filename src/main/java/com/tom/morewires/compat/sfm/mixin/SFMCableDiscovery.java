@@ -20,9 +20,15 @@ public abstract class SFMCableDiscovery {
 
         Stream<BlockPos> stream = SFMStreamUtils.<BlockPos, BlockPos>getRecursiveStream(
                 (current, next, results) -> {
-                    results.accept(current);
+                    // Only emit "cables" if they are actually cables
+                    if (CableNetwork.isCable(level, current)) {
+                        results.accept(current);
+                    }
 
-                    SFMIEAdjacency.forEachCableNeighbor(level, current, neighbor -> {
+                    // Traverse only through valid vertices (cables OR IE wire nodes),
+                    // NOT raw physical neighbors.
+                    SFMIEAdjacency.forEachNetworkNeighbor(level, current, neighbor -> {
+                        if (!SFMIEAdjacency.isTraversable(level, neighbor)) return;
                         next.accept(neighbor.immutable());
                     });
                 },

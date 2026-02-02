@@ -1,9 +1,9 @@
 package com.tom.morewires.compat.sfm;
 
-import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import ca.teamdman.sfm.common.util.Stored;
 import com.tom.morewires.block.OnCableConnectorBlock;
+import com.tom.morewires.compat.sfm.util.SFMTraversalScheduler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -32,7 +32,7 @@ public class SFMConnectorBlock extends OnCableConnectorBlock<SFMConnectorBlockEn
 		super.onPlace(state, world, pos, oldState, isMoving);
 
 		if (!(oldState.getBlock() instanceof ICableBlock)) {
-			CableNetworkManager.onCablePlaced(world, pos);
+			SFMTraversalScheduler.markDirty(world, pos);
 		}
 	}
 
@@ -48,7 +48,7 @@ public class SFMConnectorBlock extends OnCableConnectorBlock<SFMConnectorBlockEn
 		super.onRemove(state, level, pos, newState, isMoving);
 
 		if (!(newState.getBlock() instanceof ICableBlock)) {
-			CableNetworkManager.onCableRemoved(level, pos);
+			SFMTraversalScheduler.markDirty(level, pos);
 		}
 	}
 }

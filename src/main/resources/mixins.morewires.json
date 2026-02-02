@@ -6,7 +6,8 @@
   "mixins": [
     "SFMCableDiscovery",
     "SFMAfterGetOrRegister",
-    "SFMCableRemovedMixin"
+    "SFMCableRemovedMixin",
+    "SFMCableNetworkManagerAccess"
   ],
   "injectors": {
     "defaultRequire": 1
