@@ -1,0 +1,41 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "sfm"
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "more_immersive_wires:sfm_relay"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "sfm_relay_unlock": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:chests"
+          },
+          {
+            "items": "sfm:fancy_cable"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "sfm_relay_unlock"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "more_immersive_wires:sfm_relay"
+    ]
+  }
+}

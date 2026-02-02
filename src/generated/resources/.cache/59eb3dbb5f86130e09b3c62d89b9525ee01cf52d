@@ -1,4 +1,4 @@
-// 1.21.1	2025-03-29T21:52:50.9480423	Loot Tables
+// 1.21.1	2026-02-02T02:52:29.2937679	Loot Tables
 c9ef1fb482713793b4b5bc64b29e0d9959f6a22d data/more_immersive_wires/loot_table/blocks/ae_connector.json
 301e58c1df8af34803321f52eda792048d90b127 data/more_immersive_wires/loot_table/blocks/ae_dense_connector.json
 7d2deb3a77d59c2e4b3ac43eed38f059c7d62251 data/more_immersive_wires/loot_table/blocks/ae_dense_relay.json
@@ -10,3 +10,5 @@ fb041c92d3a2de4777c7d8ad4d7489532552ea30 data/more_immersive_wires/loot_table/bl
 34e384e951fb467cb8c21ce9d6e3029d4ebe38d2 data/more_immersive_wires/loot_table/blocks/id_relay.json
 a2a85ef40beffa778264435e75dda1ca59b2be99 data/more_immersive_wires/loot_table/blocks/rs_connector.json
 1032fa32951e29c8ba527134ec762574a2279943 data/more_immersive_wires/loot_table/blocks/rs_relay.json
+62e989b17064dfee7ab964b9e9bbe806f63cfbe1 data/more_immersive_wires/loot_table/blocks/sfm_connector.json
+d72254bbaa8f134aacfd71759542a3c3d83a3db7 data/more_immersive_wires/loot_table/blocks/sfm_relay.json

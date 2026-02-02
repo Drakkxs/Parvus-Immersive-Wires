@@ -28,15 +28,10 @@ public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConn
 
 	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset) {
-		if (level == null) return false;
-
-		GlobalWireNetwork net = GlobalWireNetwork.getNetwork(level);
-		if (net == null) return false;
-
-		LocalWireNetwork local = net.getNullableLocalNet(new ConnectionPoint(this.worldPosition, 0));
-		if (local != null && !local.getConnections(this.worldPosition).isEmpty())
+		LocalWireNetwork local = this.globalNet.getNullableLocalNet(new ConnectionPoint(this.worldPosition, 0));
+		if (local != null && !local.getConnections(this.worldPosition).isEmpty()) {
 			return false;
-
+		}
 		return cableType == MoreImmersiveWires.SFM_WIRE.simple().wireType;
 	}
 

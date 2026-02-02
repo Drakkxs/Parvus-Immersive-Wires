@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "sfm"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "tag": "c:chests"
+    },
+    "c": {
+      "item": "sfm:fancy_cable"
+    },
+    "w": {
+      "item": "sfm:cable"
+    }
+  },
+  "pattern": [
+    " c ",
+    "bcb",
+    "bwb"
+  ],
+  "result": {
+    "count": 4,
+    "id": "more_immersive_wires:sfm_connector"
+  }
+}

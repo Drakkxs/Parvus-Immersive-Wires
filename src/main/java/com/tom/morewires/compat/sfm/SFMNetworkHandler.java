@@ -3,7 +3,6 @@ package com.tom.morewires.compat.sfm;
 import blusunrize.immersiveengineering.api.wires.GlobalWireNetwork;
 import blusunrize.immersiveengineering.api.wires.IImmersiveConnectable;
 import blusunrize.immersiveengineering.api.wires.LocalWireNetwork;
-import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import com.tom.morewires.network.SimpleNetworkHandler;
 
 public class SFMNetworkHandler extends SimpleNetworkHandler<SFMConnectorBlockEntity, SFMNetworkHandler> {

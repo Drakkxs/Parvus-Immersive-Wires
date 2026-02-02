@@ -1,0 +1,38 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "sfm"
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "more_immersive_wires:sfm_coil"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "sfm_unlock": {
+      "conditions": {
+        "items": [
+          {
+            "items": "sfm:cable"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "sfm_unlock"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "more_immersive_wires:sfm_coil"
+    ]
+  }
+}

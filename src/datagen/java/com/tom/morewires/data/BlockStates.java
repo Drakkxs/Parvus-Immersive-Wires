@@ -67,7 +67,7 @@ public class BlockStates extends ExtendedBlockstateProvider {
 		});
 
 		createAllRotatedBlock(MoreImmersiveWires.AE_DENSE_WIRE.simple().CONNECTOR, d -> {
-			boolean p = (boolean) d.getSetStates().get(AEDenseConnectorBlock.POWERED);
+			boolean p = Boolean.TRUE.equals(d.getSetStates().get(AEDenseConnectorBlock.POWERED));
 			return models().withExistingParent("ae_dense_connector" + (p ? "_p" : ""), modLoc("block/ae_dense_connector_base")).
 					texture("base", modLoc("block/ae_dense_connector_base" + (p ? "_powered" : "")));
 		}, List.of(AEDenseConnectorBlock.POWERED));
