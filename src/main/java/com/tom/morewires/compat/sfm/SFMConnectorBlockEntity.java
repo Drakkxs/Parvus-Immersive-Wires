@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Collection;
 
-public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConnector, ICableBlock {
+public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConnector {
 	protected GlobalWireNetwork globalNet;
 
 	public SFMConnectorBlockEntity(BlockPos pos, BlockState state) {
@@ -29,10 +29,15 @@ public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConn
 
 	@Override
 	public boolean canConnectCable(WireType cableType, ConnectionPoint target, Vec3i offset) {
-		LocalWireNetwork local = this.globalNet.getNullableLocalNet(new ConnectionPoint(this.worldPosition, 0));
-		if (local != null && !local.getConnections(this.worldPosition).isEmpty()) {
+		if (level == null) return false;
+
+		GlobalWireNetwork net = GlobalWireNetwork.getNetwork(level);
+		if (net == null) return false;
+
+		LocalWireNetwork local = net.getNullableLocalNet(new ConnectionPoint(this.worldPosition, 0));
+		if (local != null && !local.getConnections(this.worldPosition).isEmpty())
 			return false;
-		}
+
 		return cableType == MoreImmersiveWires.SFM_WIRE.simple().wireType;
 	}
 
@@ -73,7 +78,9 @@ public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConn
 		super.onLoad();
 		if (level != null && !level.isClientSide) {
 			globalNet = GlobalWireNetwork.getNetwork(level);
-			ConnectorBlockEntityHelper.onChunkLoad(this, level);
+			if (globalNet != null) {
+				ConnectorBlockEntityHelper.onChunkLoad(this, level);
+			}
 		}
 	}
 
