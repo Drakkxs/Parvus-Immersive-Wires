@@ -1,8 +1,6 @@
 package com.tom.morewires.compat.sfm;
 
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
-import com.tom.morewires.compat.rs.RSConnectorBlock;
-import com.tom.morewires.compat.rs.RSConnectorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;

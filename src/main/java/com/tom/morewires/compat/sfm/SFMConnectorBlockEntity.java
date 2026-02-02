@@ -2,14 +2,11 @@ package com.tom.morewires.compat.sfm;
 
 import blusunrize.immersiveengineering.api.wires.*;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
-import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import com.google.common.collect.ImmutableList;
 import com.tom.morewires.MoreImmersiveWires;
 import com.tom.morewires.tile.IOnCable.IOnCableConnector;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
