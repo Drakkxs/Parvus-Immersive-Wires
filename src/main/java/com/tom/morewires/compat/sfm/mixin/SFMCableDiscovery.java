@@ -23,9 +23,7 @@ public abstract class SFMCableDiscovery {
                     results.accept(current);
 
                     SFMIEAdjacency.forEachCableNeighbor(level, current, neighbor -> {
-                        if (CableNetwork.isCable(level, neighbor)) {
-                            next.accept(neighbor.immutable());
-                        }
+                        next.accept(neighbor.immutable());
                     });
                 },
                 start

@@ -83,10 +83,10 @@ public abstract class SFMAfterGetOrRegister {
 
             // Enqueue only valid cable neighbors (keeps BFS tight)
             SFMIEAdjacency.forEachCableNeighbor(level, cur, neighbor -> {
-                if (!CableNetwork.isCable(level, neighbor)) return;
                 long key = neighbor.asLong();
                 if (seen.add(key)) q.add(neighbor.immutable());
             });
+
 
         }
 

@@ -12,7 +12,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class SFMWireDefinition extends SimpleWireTypeDefinition<SFMConnectorBlockEntity> {
     public SFMWireDefinition() {
-        super("sfm", "SFM Cable", 0xFF6600);
+        super("sfm", "SFM Cable", 0x17161f);
     }
 
     @Override
