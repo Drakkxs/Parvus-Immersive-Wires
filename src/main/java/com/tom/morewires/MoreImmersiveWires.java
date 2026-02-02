@@ -68,7 +68,7 @@ public class MoreImmersiveWires {
 	public static final String CC = "computercraft";
 	public static final String FTBIC = "ftbic";
 	public static final String IC2 = "ic2";
-	public static final String SFM = "superfactorymanager";
+	public static final String SFM = "sfm";
 
 	public static final Wire AE_WIRE = new Wire(AE, () -> AEWireDefinition::new);
 	public static final Wire AE_DENSE_WIRE = new Wire(AE, () -> AEDenseWireDefinition::new);
