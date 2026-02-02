@@ -94,20 +94,5 @@ public abstract class SFMAfterGetOrRegister {
 
         net.getLevelCapabilityCache().clear();
 
-        int bad = 0;
-        for (var it = net.getCablePositionsRaw().iterator(); it.hasNext();) {
-            long p = it.nextLong();
-            BlockPos bp = BlockPos.of(p);
-            if (!CableNetwork.isCable(level, bp)) {
-                bad++;
-                if (bad > 0 && level.getGameTime() % 20 == 0) {
-                    MoreImmersiveWires.LOGGER.warn("[MIW:SFM] BAD CABLE POS in cablePositions: {}", bp);
-                }
-            }
-        }
-        MoreImmersiveWires.LOGGER.info("[MIW:SFM] cablePositions size={}, bad={}", net.getCableCount(), bad);
-
-        long capCount = net.getCapabilityProviderPositions().count();
-        MoreImmersiveWires.LOGGER.info("[MIW:SFM] capabilityProviderPositions={}", capCount);
     }
 }

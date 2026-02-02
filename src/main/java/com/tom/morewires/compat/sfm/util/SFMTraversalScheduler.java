@@ -53,12 +53,6 @@ public final class SFMTraversalScheduler {
         Level level = event.getLevel();
         if (!(level instanceof ServerLevel)) return;
 
-
-        if (!printed) {
-            printed = true;
-            System.out.println("[MIW:SFM] onLevelTick is alive");
-        }
-
         Job job = JOBS.get(level);
         if (job == null || job.seed == null) return;
 
