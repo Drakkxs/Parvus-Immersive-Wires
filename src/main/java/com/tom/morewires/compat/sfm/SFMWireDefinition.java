@@ -26,11 +26,6 @@ public class SFMWireDefinition extends SimpleWireTypeDefinition<SFMConnectorBloc
     }
 
     @Override
-    public Block makeBlock(DeferredHolder<BlockEntityType<?>, BlockEntityType<SFMConnectorBlockEntity>> type) {
-        return new SFMConnectorBlock(type, this::isCable);
-    }
-
-    @Override
     public boolean isCable(BlockGetter level, BlockPos pos) {
         // Check if block is SFM cable
         return level.getBlockState(pos).getBlock() instanceof ICableBlock;

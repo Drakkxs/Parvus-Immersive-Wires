@@ -1,5 +1,6 @@
 package com.tom.morewires.compat.sfm;
 
+import blusunrize.immersiveengineering.common.blocks.generic.ConnectorBlock;
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import ca.teamdman.sfm.common.util.Stored;
 import com.tom.morewires.block.OnCableConnectorBlock;
@@ -12,12 +13,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 
-public class SFMConnectorBlock extends OnCableConnectorBlock<SFMConnectorBlockEntity> implements ICableBlock {
+public class SFMConnectorBlock extends ConnectorBlock<SFMConnectorBlockEntity> implements ICableBlock {
 
-	public SFMConnectorBlock(DeferredHolder<BlockEntityType<?>, BlockEntityType<SFMConnectorBlockEntity>> type,
-							 BiPredicate<BlockGetter, BlockPos> isOnCable) {
-		super(type, isOnCable);
+	public SFMConnectorBlock(Properties props, Supplier<BlockEntityType<SFMConnectorBlockEntity>> entityType) {
+		super(props, entityType);
 	}
 
 	@Override
