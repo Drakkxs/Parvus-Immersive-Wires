@@ -3,16 +3,12 @@ package com.tom.morewires.compat.sfm;
 import blusunrize.immersiveengineering.common.blocks.generic.ConnectorBlock;
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import ca.teamdman.sfm.common.util.Stored;
-import com.tom.morewires.block.OnCableConnectorBlock;
 import com.tom.morewires.compat.sfm.util.SFMTraversalScheduler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
-import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
 public class SFMConnectorBlock extends ConnectorBlock<SFMConnectorBlockEntity> implements ICableBlock {

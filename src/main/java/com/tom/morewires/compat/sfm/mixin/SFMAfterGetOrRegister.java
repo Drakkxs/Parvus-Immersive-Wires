@@ -2,7 +2,6 @@ package com.tom.morewires.compat.sfm.mixin;
 
 import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
-import com.tom.morewires.MoreImmersiveWires;
 import com.tom.morewires.compat.sfm.util.SFMIEAdjacency;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;

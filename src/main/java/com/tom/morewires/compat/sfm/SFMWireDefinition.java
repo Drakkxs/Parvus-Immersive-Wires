@@ -5,10 +5,7 @@ import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import com.tom.morewires.SimpleWireTypeDefinition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class SFMWireDefinition extends SimpleWireTypeDefinition<SFMConnectorBlockEntity> {
     public SFMWireDefinition() {
