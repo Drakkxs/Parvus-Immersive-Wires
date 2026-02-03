@@ -46,7 +46,6 @@ public class SFMConnectorBlockEntity extends BlockEntity implements IOnCableConn
 	@Override
 	public void connectCable(WireType cableType, ConnectionPoint target, IImmersiveConnectable other, ConnectionPoint otherTarget) {
 		if (level == null || level.isClientSide) return;
-		System.out.println("[MIW:SFM] connectCable fired at " + worldPosition);
 		SFMTraversalScheduler.markDirty(level, worldPosition);
 		SFMTraversalScheduler.markDirty(level, other.getPosition());
 
