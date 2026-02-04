@@ -6,111 +6,114 @@ import aztech.modern_industrialization.api.energy.MIEnergyStorage;
 import blusunrize.immersiveengineering.api.wires.GlobalWireNetwork;
 import blusunrize.immersiveengineering.api.wires.IImmersiveConnectable;
 import blusunrize.immersiveengineering.api.wires.LocalWireNetwork;
-import com.tom.morewires.network.SimpleNetworkHandler;
+import com.tom.morewires.network.NodeNetworkHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-public class MILvNetworkHandler extends SimpleNetworkHandler<MILvConnectorBlockEntity, MILvNetworkHandler> {
+public class MILvNetworkHandler extends NodeNetworkHandler<BlockPos, BlockPos> {
     private static final CableTier TIER = CableTier.LV;
 
-    public MILvNetworkHandler(LocalWireNetwork net, GlobalWireNetwork global) {
+    // Our own mirror of “who’s in this local wire network”
+    private final Set<BlockPos> members = new HashSet<>();
+    private BlockPos mainPos;
+
+    protected MILvNetworkHandler(LocalWireNetwork net, GlobalWireNetwork global) {
         super(net, global);
     }
 
+    // Called when base resets (merge, connector load/unload, wire add/remove)
     @Override
-    protected MILvConnectorBlockEntity connect(IImmersiveConnectable iic) {
-        return (iic instanceof MILvConnectorBlockEntity be) ? be : null;
+    protected void clearConnection(BlockPos pos) {
+        members.remove(pos);
+        if (Objects.equals(mainPos, pos)) mainPos = null;
     }
 
     @Override
-    protected void setNetworkHandler(MILvConnectorBlockEntity c, MILvNetworkHandler handler) {
-        // optional: store backref in BE later
+    protected BlockPos getNode() {
+        return mainPos;
+    }
+
+    // Called once per rebuild for the first connector encountered
+    @Override
+    protected void connectFirst(IImmersiveConnectable iic, BlockPos ignoredMain) {
+        // iic is the connector in the wire network
+        mainPos = iic.getPosition();
+        members.add(mainPos);
+    }
+
+    // Called for every connector in rebuild pass
+    @Override
+    protected BlockPos connect(IImmersiveConnectable iic, BlockPos main) {
+        BlockPos pos = iic.getPosition();
+        members.add(pos);
+        return pos;
     }
 
     @Override
     public void update(Level level) {
-        super.update(level);
-        if (level.isClientSide) return;
+        super.update(level); // IMPORTANT: keeps members in sync via the callbacks above
 
-        // 1) gather connectors
-        List<MILvConnectorBlockEntity> connectors = new ArrayList<>();
-        visitAll(connectors::add);
+        if (!(level instanceof ServerLevel server)) return;
+        if (members.isEmpty()) return;
+
+        tickNetwork(server);
+    }
+
+    private void tickNetwork(ServerLevel level) {
+        final long maxTransfer = TIER.getMaxTransfer();
+
+        // 1) Resolve positions -> connector BEs that are actually loaded right now
+        List<MILvConnectorBlockEntity> connectors = new ArrayList<>(members.size());
+        for (BlockPos pos : members) {
+            var be = level.getBlockEntity(pos);
+            if (be instanceof MILvConnectorBlockEntity conn && !conn.isRemoved()) {
+                connectors.add(conn);
+            }
+        }
         if (connectors.isEmpty()) return;
 
-        long maxTransfer = TIER.getMaxTransfer();
-
-        // 2) compute networkAmount + capacity (MI-style)
+        // 2) Sum storage across loaded connectors
         long networkAmount = 0;
-        for (var c : connectors) networkAmount += c.getStored();
+        for (var c : connectors) networkAmount += c.getNodeEu();
 
         long networkCapacity = (long) connectors.size() * maxTransfer;
 
-        // 3) gather adjacent storages
+        // 3) Gather adjacent MI storages only from the connector “port” side
         List<MIEnergyStorage> storages = new ArrayList<>();
+        Set<MIEnergyStorage> dedupe = Collections.newSetFromMap(new IdentityHashMap<>());
+
         for (var conn : connectors) {
-            BlockPos pos = conn.getBlockPos();
-            for (Direction dir : Direction.values()) {
-                Direction port = conn.getFacing().getOpposite();
-                BlockPos adj = pos.relative(port);
-                MIEnergyStorage st = level.getCapability(EnergyApi.SIDED, adj, port.getOpposite());
-                if (st == null) continue;
-                if (!st.canConnect(TIER)) continue;
+            Direction port = conn.getFacing().getOpposite();
+            BlockPos adj = conn.getBlockPos().relative(port);
 
-                // Skip our own connector BE storage if it ever comes back
-                if (st == conn.getExposedEnergy()) continue;
-                if (!storages.contains(st)) storages.add(st);
-            }
+            MIEnergyStorage st = level.getCapability(EnergyApi.SIDED, adj, port.getOpposite());
+            if (st == null) continue;
+            if (!st.canConnect(TIER)) continue;
+            if (st == conn.getExposedEnergy()) continue; // avoid self
+
+            if (dedupe.add(st)) storages.add(st);
         }
 
-        if (storages.isEmpty()) {
-            // still rebalance to keep connector values sane
-            rebalance(connectors, networkAmount);
-            return;
-        }
-
-        // Split providers/consumers
-        List<MIEnergyStorage> providers = new ArrayList<>();
-        List<MIEnergyStorage> consumers = new ArrayList<>();
-        for (var s : storages) {
-            if (s.canExtract()) providers.add(s);
-            if (s.canReceive()) consumers.add(s);
-        }
-
-        // 4) extract into network pool (cap by remaining capacity + tier maxTransfer like MI)
-        if (!providers.isEmpty()) {
+        // 4) MI-style transfer (tier-limited, fair)
+        if (!storages.isEmpty()) {
             long extractMax = Math.min(maxTransfer, networkCapacity - networkAmount);
-            if (extractMax > 0) {
-                long extracted = transferForTargets(MIEnergyStorage::extract, providers, extractMax);
-                networkAmount += extracted;
-            }
-        }
+            if (extractMax > 0) networkAmount += transferForTargets(MIEnergyStorage::extract, storages, extractMax);
 
-        // 5) insert out of pool
-        if (!consumers.isEmpty()) {
             long insertMax = Math.min(maxTransfer, networkAmount);
-            if (insertMax > 0) {
-                long inserted = transferForTargets(MIEnergyStorage::receive, consumers, insertMax);
-                networkAmount -= inserted;
-            }
+            if (insertMax > 0) networkAmount -= transferForTargets(MIEnergyStorage::receive, storages, insertMax);
         }
 
-        // 6) rebalance remaining EU evenly across connectors (MI-style)
-        rebalance(connectors, networkAmount);
-    }
-
-    private void rebalance(List<MILvConnectorBlockEntity> connectors, long networkAmount) {
-        // Even distribution, MI style
+        // 5) Rebalance evenly across nodes (MI behavior)
         long remaining = networkAmount;
         int remainingCount = connectors.size();
 
         for (var c : connectors) {
             long share = remainingCount > 0 ? (remaining / remainingCount) : 0;
-            c.setStored(share);
+            c.setNodeEu(share);
             remaining -= share;
             remainingCount--;
         }
@@ -124,21 +127,17 @@ public class MILvNetworkHandler extends SimpleNetworkHandler<MILvConnectorBlockE
     private static long transferForTargets(TransferOp op, List<MIEnergyStorage> targets, long maxAmount) {
         if (maxAmount <= 0 || targets.isEmpty()) return 0;
 
-        // Shuffle to avoid bias like MI
         Collections.shuffle(targets);
 
-        // Simulate
         long[] sim = new long[targets.size()];
         for (int i = 0; i < targets.size(); i++) {
             sim[i] = op.transfer(targets.get(i), maxAmount, true);
         }
 
-        // Sort indices by sim result (low to high)
         Integer[] idx = new Integer[targets.size()];
         for (int i = 0; i < idx.length; i++) idx[i] = i;
-        java.util.Arrays.sort(idx, java.util.Comparator.comparingLong(i -> sim[i]));
+        Arrays.sort(idx, Comparator.comparingLong(i -> sim[i]));
 
-        // Perform fair split
         long transferred = 0;
         for (int k = 0; k < idx.length; k++) {
             int i = idx[k];
