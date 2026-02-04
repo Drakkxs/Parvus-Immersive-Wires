@@ -1,0 +1,7 @@
+Progression for MI Wire tires:
+
+Asprite Hue and Adjustments based on SFM coil, relay, connector.
+H: -65 
+S: -30 (Each Tier is ten closer till zero is super conductor)
+L: 0
+A: 0
