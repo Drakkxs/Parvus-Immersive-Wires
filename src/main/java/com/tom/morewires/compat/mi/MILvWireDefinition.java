@@ -23,7 +23,7 @@ public class MILvWireDefinition extends SimpleWireTypeDefinition<MILvConnectorBl
 
     @Override
     public Block makeBlock(DeferredHolder<BlockEntityType<?>, BlockEntityType<MILvConnectorBlockEntity>> type) {
-        return new MILvConnectorBlock(ConnectorBlock.PROPERTIES.get(), () -> type.get());
+        return new MILvConnectorBlock(type, this::isCable);
     }
 
     @Override
