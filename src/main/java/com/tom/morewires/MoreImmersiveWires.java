@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import com.tom.morewires.compat.mi.MILvWireDefinition;
 import com.tom.morewires.compat.sfm.SFMWireDefinition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,6 +70,7 @@ public class MoreImmersiveWires {
 	public static final String FTBIC = "ftbic";
 	public static final String IC2 = "ic2";
 	public static final String SFM = "sfm";
+	public static final String MI = "modern_industrialization";
 
 	public static final Wire AE_WIRE = new Wire(AE, () -> AEWireDefinition::new);
 	public static final Wire AE_DENSE_WIRE = new Wire(AE, () -> AEDenseWireDefinition::new);
@@ -76,6 +78,7 @@ public class MoreImmersiveWires {
 	public static final Wire CC_WIRE = new Wire(CC, () -> CCWireDefinition::new);
 	public static final Wire ID_WIRE = new Wire(ID, () -> IntegratedDynamicsWireDefinition::new);
 	public static final Wire SFM_WIRE = new Wire(SFM, () -> SFMWireDefinition::new);
+	public static final Wire MI_LV_WIRE = new Wire(MI, () -> MILvWireDefinition::new);
 
 	public static class Wire {
 		public final String modid;

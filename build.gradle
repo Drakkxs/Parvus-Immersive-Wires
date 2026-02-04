@@ -20,6 +20,13 @@ repositories {
         }
     }
     maven {
+        name "Modmaven"
+        url "https://modmaven.dev"
+        content {
+            includeGroup "dev.technici4n"
+        }
+    }
+    maven {
         // Location of the maven for mixed mappings, Registrate, and Flywheel
         name 'tterrag maven'
         url 'https://maven.tterrag.com'
@@ -176,8 +183,12 @@ dependencies {
     // Modern Industrialisation (NeoForge 1.21.1)
     implementation 'curse.maven:modern-industrialization-405388:7309662'
 
-    // Cloth Config (NeoForge 1.21.1)
-    implementation 'curse.maven:cloth-config-348521:5729127'
+    compileOnly "dev.technici4n:GrandPower:3.0.0"
+
+    // Cloth Config (NeoForge
+    // 1.21.1)
+    compileOnly "curse.maven:cloth-config-348521:5729127"
+    runtimeOnly "curse.maven:cloth-config-348521:5729127" // optional, but nice for dev testing 'curse.maven:cloth-config-348521:5729127'
 
 	// Super Factory Manager (NeoForge 1.21.1)
     implementation "curse.maven:super-factory-manager-306935:7254808"
