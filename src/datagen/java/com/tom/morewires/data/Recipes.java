@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import ca.teamdman.sfm.common.registry.SFMBlockTags;
+import aztech.modern_industrialization.MIBlock;
+import aztech.modern_industrialization.MIItem;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import org.cyclops.integrateddynamics.RegistryEntries;
 
@@ -51,9 +52,10 @@ public class Recipes extends RecipeProvider {
 		AE(MoreImmersiveWires.AE_WIRE, CraftingIngredient.of(Blocks.DEEPSLATE), CraftingIngredient.of(ConventionTags.FLUIX_CRYSTAL), CraftingIngredient.of(ConventionTags.GLASS_CABLE)),
 		AE_DENSE(MoreImmersiveWires.AE_DENSE_WIRE, CraftingIngredient.of(AEBlocks.SKY_STONE_BLOCK), CraftingIngredient.of(AEBlocks.FLUIX_BLOCK), CraftingIngredient.of(ConventionTags.COVERED_DENSE_CABLE)),
 		RS(MoreImmersiveWires.RS_WIRE, CraftingIngredient.of(Tags.Items.STONES), CraftingIngredient.of(com.refinedmods.refinedstorage.common.content.Items.INSTANCE.getQuartzEnrichedCopper()), new TagIngredient(com.refinedmods.refinedstorage.common.content.Tags.CABLES)),
-		SFM(MoreImmersiveWires.SFM_WIRE, CraftingIngredient.of(Tags.Items.CHESTS), CraftingIngredient.of(SFMBlocks.FANCY_CABLE_BLOCK.get()), CraftingIngredient.of(SFMBlocks.CABLE_BLOCK.get())),
 		ID(MoreImmersiveWires.ID_WIRE, CraftingIngredient.of(RegistryEntries.BLOCK_MENRIL_WOOD.get()), CraftingIngredient.of("integrateddynamics:crystalized_menril_chunk"), CraftingIngredient.of(RegistryEntries.BLOCK_CABLE.get())),
 		CC(MoreImmersiveWires.CC_WIRE, CraftingIngredient.of(Tags.Items.STONES), CraftingIngredient.of(Items.REDSTONE), CraftingIngredient.of(ModRegistry.Items.CABLE.get())),
+		SFM(MoreImmersiveWires.SFM_WIRE, CraftingIngredient.of(Tags.Items.CHESTS), CraftingIngredient.of(SFMBlocks.FANCY_CABLE_BLOCK.get()), CraftingIngredient.of(SFMBlocks.CABLE_BLOCK.get())),
+		MI_LV(MoreImmersiveWires.MI_LV_WIRE, CraftingIngredient.of(Tags.Items.STONES), CraftingIngredient.of(MIBlock.BASIC_MACHINE_HULL), CraftingIngredient.of(MIItem.RUBBER_SHEET))
 		;
 		public final WireInfo[] wire;
 		public final ConnectorInfo[] connector;
