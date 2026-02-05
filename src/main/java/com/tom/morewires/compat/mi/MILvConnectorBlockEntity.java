@@ -1,10 +1,16 @@
 package com.tom.morewires.compat.mi;
 
+import aztech.modern_industrialization.MI;
 import aztech.modern_industrialization.api.energy.CableTier;
+import aztech.modern_industrialization.api.energy.CableTierHolder;
 import aztech.modern_industrialization.api.energy.MIEnergyStorage;
+import aztech.modern_industrialization.pipes.api.PipeNetworkData;
+import aztech.modern_industrialization.pipes.api.PipeNetworkType;
+import aztech.modern_industrialization.pipes.electricity.ElectricityNetworkData;
+import aztech.modern_industrialization.pipes.impl.PipeNetworks;
 import blusunrize.immersiveengineering.api.wires.*;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces;
-import com.google.common.collect.ImmutableList;
+import blusunrize.immersiveengineering.common.blocks.generic.ConnectorBlock;
 import com.tom.morewires.MoreImmersiveWires;
 import com.tom.morewires.tile.IOnCable.IOnCableConnector;
 import net.minecraft.core.BlockPos;
@@ -12,211 +18,132 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-
 public class MILvConnectorBlockEntity extends BlockEntity
-		implements MIEnergyStorage, IOnCableConnector, IEBlockInterfaces.IStateBasedDirectional {
+        implements MIEnergyStorage, CableTierHolder, IImmersiveConnectable, IOnCableConnector,
+        IEBlockInterfaces.IStateBasedDirectional {
 
-	public MILvConnectorBlockEntity(BlockPos pos, BlockState state) {
-		super(MoreImmersiveWires.MI_LV_WIRE.simple().CONNECTOR_ENTITY.get(), pos, state);
-	}
+    private static final CableTier TIER = CableTier.LV;
 
+    private long eu = 0; // internal buffer
 
-	private static final CableTier TIER = CableTier.LV;
+    public MILvConnectorBlockEntity(BlockPos pos, BlockState state) {
+        super(MoreImmersiveWires.MI_LV_WIRE.simple().CONNECTOR_ENTITY.get(), pos, state);
+    }
 
-	private long eu = 0;
+    // ----- MI tier -----
+    @Override
+    public CableTier getCableTier() {
+        return TIER;
+    }
 
-	private final MIEnergyStorage exposed = new MIEnergyStorage() {
-		@Override public boolean canConnect(CableTier tier) { return tier == TIER; }
-		@Override public long receive(long maxReceive, boolean simulate) { return MILvConnectorBlockEntity.this.receive(maxReceive, simulate); }
-		@Override public long extract(long maxExtract, boolean simulate) { return MILvConnectorBlockEntity.this.extract(maxExtract, simulate); }
-		@Override public long getAmount() { return MILvConnectorBlockEntity.this.getAmount(); }
-		@Override public long getCapacity() { return MILvConnectorBlockEntity.this.getCapacity(); }
-		@Override public boolean canReceive() { return true; }
-		@Override public boolean canExtract() { return true; }
-	};
+    @Override
+    public boolean canConnect(CableTier tier) {
+        return tier == TIER;
+    }
 
-	protected GlobalWireNetwork globalNet;
-	private boolean isUnloaded = false;
+    private final MIEnergyStorage exposed = new MIEnergyStorage() {
+        @Override public boolean canConnect(CableTier tier) { return tier == TIER; }
+        @Override public long receive(long maxReceive, boolean simulate) { return MILvConnectorBlockEntity.this.receive(maxReceive, simulate); }
+        @Override public long extract(long maxExtract, boolean simulate) { return MILvConnectorBlockEntity.this.extract(maxExtract, simulate); }
+        @Override public long getAmount() { return MILvConnectorBlockEntity.this.getAmount(); }
+        @Override public long getCapacity() { return MILvConnectorBlockEntity.this.getCapacity(); }
+        @Override public boolean canReceive() { return MILvConnectorBlockEntity.this.canReceive(); }
+        @Override public boolean canExtract() { return MILvConnectorBlockEntity.this.canExtract(); }
+    };
 
-	@Override
-	public void setLevel(Level level) {
-		super.setLevel(level);
-		globalNet = GlobalWireNetwork.getNetwork(level);
-	}
+    public MIEnergyStorage getExposedEnergy() { return exposed; }
 
-	@Override
-	public void onLoad() {
-		super.onLoad();
-		if (level != null && !level.isClientSide) {
-			ConnectorBlockEntityHelper.onChunkLoad(this, level);
-		}
-		isUnloaded = false;
-	}
+    // Capacity: pick something reasonable.
+    // If you want “pipe-like”, using maxTransfer per node is fine:
+    @Override
+    public long getCapacity() {
+        return TIER.getMaxTransfer();
+    }
 
-	@Override
-	public void onChunkUnloaded() {
-		super.onChunkUnloaded();
-		if (level != null && !level.isClientSide && globalNet != null) {
-			ConnectorBlockEntityHelper.onChunkUnload(globalNet, this);
-		}
-		isUnloaded = true;
-	}
+    @Override
+    public long getAmount() {
+        return eu;
+    }
 
-	private void setRemovedIE() {
-		if (level != null && !level.isClientSide && globalNet != null) {
-			ConnectorBlockEntityHelper.remove(level, this);
-		}
-	}
+    @Override
+    public boolean canReceive() {
+        return true;
+    }
 
-	@Override
-	public void setRemoved() {
-		super.setRemoved();
-		if (!isUnloaded) setRemovedIE();
-	}
+    @Override
+    public boolean canExtract() {
+        return true;
+    }
 
-	// in MILvConnectorBlockEntity
-	private long lastNetworkEu;
-	private long lastNetworkCap;
+    @Override
+    public long receive(long maxReceive, boolean simulate) {
+        if (maxReceive <= 0) return 0;
+        long space = getCapacity() - eu;
+        long moved = Math.min(maxReceive, Math.max(0, space));
+        if (!simulate && moved > 0) {
+            eu += moved;
+            setChanged();
+        }
+        return moved;
+    }
 
-	public void setNetworkInfo(long eu, long cap) {
-		this.lastNetworkEu = eu;
-		this.lastNetworkCap = cap;
-	}
+    @Override
+    public long extract(long maxExtract, boolean simulate) {
+        if (maxExtract <= 0) return 0;
+        long moved = Math.min(maxExtract, eu);
+        if (!simulate && moved > 0) {
+            eu -= moved;
+            setChanged();
+        }
+        return moved;
+    }
 
-	public long getNetworkStoredEu() { return lastNetworkEu; }
-	public long getNetworkCapacityEu() { return lastNetworkCap; }
+    // ----- Facing property (needed by IOnCableConnector bounds + port logic) -----
+    @Override
+    public Property<Direction> getFacingProperty() {
+        return ConnectorBlock.DEFAULT_FACING_PROP; // (IEProperties.FACING_ALL)
+    }
 
-	public MIEnergyStorage getExposedEnergy() {
-		return exposed;
-	}
+    @Override
+    public BlockState getState() { return getBlockState(); }
 
-	@Override
-	public Level getLevelNonnull() {
-		return level;
-	}
+    @Override
+    public void setState(BlockState state) {
+        if (level != null) level.setBlock(worldPosition, state, 3);
+    }
 
-	@Override
-	public Collection<ResourceLocation> getRequestedHandlers() {
-		return ImmutableList.of(MoreImmersiveWires.MI_LV_WIRE.simple().NET_ID);
-	}
+    // ----- IE connectable bits (keep what you already had) -----
+    @Override public boolean canConnect() { return true; }
+    @Override public BlockPos getPosition() { return worldPosition; }
+    @Override public Level getLevelNonnull() { return level; }
 
-	// --- Facing (IE) ---
-	@Override
-	public Property<Direction> getFacingProperty() {
-		return MILvConnectorBlock.FACING;
-	}
+    @Override
+    public boolean canConnectCable(WireType wireType, ConnectionPoint target, Vec3i offset) {
+        return level != null && !level.isClientSide
+                && wireType == MoreImmersiveWires.MI_LV_WIRE.simple().wireType;
+    }
 
-	@Override
-	public void setState(BlockState state) {
-		if (level != null) level.setBlock(worldPosition, state, 3);
-	}
+    @Override public void connectCable(WireType type, ConnectionPoint target, IImmersiveConnectable other, ConnectionPoint otherTarget) { setChanged(); }
+    @Override public void removeCable(@Nullable Connection connection, ConnectionPoint attachedPoint) { setChanged(); }
 
-	@Override
-	public boolean canConnect() {
-		return true;
-	}
+    // ----- NBT -----
 
-	@Override
-	public boolean canConnectCable(WireType wireType, ConnectionPoint target, Vec3i offset) {
-		if (level == null || level.isClientSide) return false;
-		return wireType == MoreImmersiveWires.MI_LV_WIRE.simple().wireType;
-	}
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.putLong("eu", eu);
+    }
 
-	@Override
-	public void connectCable(WireType type, ConnectionPoint target, IImmersiveConnectable other, ConnectionPoint otherTarget) {
-		setChanged();
-	}
-
-	@Override
-	public void removeCable(@Nullable Connection connection, ConnectionPoint attachedPoint) {
-		setChanged();
-	}
-
-	@Override
-	public BlockPos getPosition() {
-		return worldPosition;
-	}
-
-	@Override
-	public BlockState getState() {
-		return getBlockState();
-	}
-
-	@Override
-	public boolean canConnect(CableTier cableTier) {
-		return cableTier == TIER;
-	}
-
-	@Override
-	public long getAmount() {
-		return eu;
-	}
-
-	@Override
-	public long getCapacity() {
-		return TIER.getMaxTransfer(); // MI pipes: capacity == maxTransfer per node
-	}
-
-	@Override
-	public boolean canReceive() {
-		return true;
-	}
-
-	@Override
-	public boolean canExtract() {
-		return true;
-	}
-
-	public long getNodeEu() { return eu; }
-
-	public void setNodeEu(long value) {
-		eu = Math.max(0, Math.min(value, getCapacity()));
-		setChanged();
-	}
-
-	@Override
-	public long receive(long maxReceive, boolean simulate) {
-		if (maxReceive <= 0) return 0;
-		long space = getCapacity() - eu;
-		long moved = Math.min(maxReceive, Math.max(0, space));
-		if (!simulate && moved > 0) {
-			eu += moved;
-			setChanged();
-		}
-		return moved;
-	}
-
-	@Override
-	public long extract(long maxExtract, boolean simulate) {
-		if (maxExtract <= 0) return 0;
-		long moved = Math.min(maxExtract, eu);
-		if (!simulate && moved > 0) {
-			eu -= moved;
-			setChanged();
-		}
-		return moved;
-	}
-
-	@Override
-	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-		super.saveAdditional(tag, registries);
-		tag.putLong("eu", eu);
-	}
-
-	@Override
-	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-		super.loadAdditional(tag, registries);
-		eu = tag.getLong("eu");
-		if (eu < 0) eu = 0;
-		long cap = getCapacity();
-		if (eu > cap) eu = cap;
-	}
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        eu = Math.max(0, Math.min(tag.getLong("eu"), getCapacity()));
+    }
 }
