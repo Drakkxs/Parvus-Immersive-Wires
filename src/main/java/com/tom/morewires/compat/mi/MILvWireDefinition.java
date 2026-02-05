@@ -1,11 +1,8 @@
 package com.tom.morewires.compat.mi;
 
-import aztech.modern_industrialization.api.energy.CableTier;
 import aztech.modern_industrialization.api.energy.EnergyApi;
-import aztech.modern_industrialization.api.energy.MIEnergyStorage;
 import blusunrize.immersiveengineering.api.wires.localhandlers.ILocalHandlerConstructor;
 import com.tom.morewires.SimpleWireTypeDefinition;
-import dev.technici4n.grandpower.api.ILongEnergyStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -54,30 +51,6 @@ public class MILvWireDefinition extends SimpleWireTypeDefinition<MILvConnectorBl
 
             Direction port = be.getFacing(); // your “port == facing” discovery
             return side == port ? be.getExposedEnergy() : null;
-        });
-
-        // 2) GrandPower (some MI endpoints may use this instead)
-        event.registerBlockEntity(ILongEnergyStorage.BLOCK, CONNECTOR_ENTITY.get(), (be, side) -> {
-            // If you want “port only”, gate it the same way:
-            if (side != null && side != be.getFacing()) return null;
-
-            // Wrap your MIEnergyStorage into ILongEnergyStorage
-            // (If MI’s bidirectional compat is enabled, MI may already wrap,
-            // but registering this makes it explicit and removes ambiguity.)
-            var mi = be.getExposedEnergy();
-            return new ILongEnergyStorage() {
-                @Override public long receive(long maxReceive, boolean simulate) {
-                    // NOTE: this interface uses “long” too, but units may differ depending on config.
-                    return mi.receive(maxReceive, simulate);
-                }
-                @Override public long extract(long maxExtract, boolean simulate) {
-                    return mi.extract(maxExtract, simulate);
-                }
-                @Override public long getAmount() { return mi.getAmount(); }
-                @Override public long getCapacity() { return mi.getCapacity(); }
-                @Override public boolean canExtract() { return mi.canExtract(); }
-                @Override public boolean canReceive() { return mi.canReceive(); }
-            };
         });
     }
 }
