@@ -11,7 +11,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 public class MIHvWireDefinition extends MIWireDefinitionBase<MIHvConnectorBlockEntity> {
 
     public MIHvWireDefinition() {
-        super("mi_hv", "Modern High Voltage", 0x5a596b);
+        super("mi_hv", "Modern High Voltage", 0x006192);
     }
 
     @Override

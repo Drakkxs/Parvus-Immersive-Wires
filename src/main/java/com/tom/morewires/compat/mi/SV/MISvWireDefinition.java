@@ -1,4 +1,4 @@
-package com.tom.morewires.compat.mi.EXV;
+package com.tom.morewires.compat.mi.SV;
 
 import blusunrize.immersiveengineering.api.wires.localhandlers.ILocalHandlerConstructor;
 import com.tom.morewires.compat.mi.MIWireDefinitionBase;
@@ -8,30 +8,30 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
-public class MIEXvWireDefinition extends MIWireDefinitionBase<MIEXvConnectorBlockEntity> {
+public class MISvWireDefinition extends MIWireDefinitionBase<MISvConnectorBlockEntity> {
 
-    public MIEXvWireDefinition() {
-        super("mi_exv", "Modern Extreme Voltage", 0x17161f);
+    public MISvWireDefinition() {
+        super("mi_sv", "Modern Superconductor", 0xefefef);
     }
 
     @Override
     protected ILocalHandlerConstructor createMIHandler() {
-        return MIEXvNetworkHandler::new;
+        return MISvNetworkHandler::new;
     }
 
     @Override
-    protected Block createMIBlock(DeferredHolder<BlockEntityType<?>, BlockEntityType<MIEXvConnectorBlockEntity>> type) {
-        return new MIEXvConnectorBlock(type, this::isCable);
+    protected Block createMIBlock(DeferredHolder<BlockEntityType<?>, BlockEntityType<MISvConnectorBlockEntity>> type) {
+        return new MISvConnectorBlock(type, this::isCable);
         // or: return new MIConnectorBlock<>(type, this::isCable); if you went generic there
     }
 
     @Override
-    protected MIEXvConnectorBlockEntity createMIBE(BlockPos pos, BlockState state) {
-        return new MIEXvConnectorBlockEntity(pos, state);
+    protected MISvConnectorBlockEntity createMIBE(BlockPos pos, BlockState state) {
+        return new MISvConnectorBlockEntity(pos, state);
     }
 
     @Override
     protected Class<? extends Block> getCableBlockClass() {
-        return MIEXvConnectorBlock.class;
+        return MISvConnectorBlock.class;
     }
 }

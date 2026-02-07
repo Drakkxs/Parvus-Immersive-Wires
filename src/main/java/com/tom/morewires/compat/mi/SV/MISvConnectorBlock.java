@@ -1,4 +1,4 @@
-package com.tom.morewires.compat.mi.EXV;
+package com.tom.morewires.compat.mi.SV;
 
 import com.tom.morewires.compat.mi.MIConnectorBlock;
 import net.minecraft.core.BlockPos;
@@ -8,9 +8,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.function.BiPredicate;
 
-public class MIEXvConnectorBlock extends MIConnectorBlock<MIEXvConnectorBlockEntity> {
-    public MIEXvConnectorBlock(
-            DeferredHolder<BlockEntityType<?>, BlockEntityType<MIEXvConnectorBlockEntity>> type,
+public class MISvConnectorBlock extends MIConnectorBlock<MISvConnectorBlockEntity> {
+    public MISvConnectorBlock(
+            DeferredHolder<BlockEntityType<?>, BlockEntityType<MISvConnectorBlockEntity>> type,
             BiPredicate<BlockGetter, BlockPos> isOnCable
     ) {
         super(type, isOnCable);

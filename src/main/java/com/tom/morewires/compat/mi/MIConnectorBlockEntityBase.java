@@ -148,12 +148,6 @@ public abstract class MIConnectorBlockEntityBase extends BlockEntity
     }
 
     @Override
-    public void setRemoved() {
-        super.setRemoved();
-        if (level != null && !level.isClientSide) ConnectorBlockEntityHelper.remove(level, this);
-    }
-
-    @Override
     public void setLevel(Level level) {
         super.setLevel(level);
         if (level != null && !level.isClientSide) globalNet = GlobalWireNetwork.getNetwork(level);
@@ -162,11 +156,19 @@ public abstract class MIConnectorBlockEntityBase extends BlockEntity
     @Override
     public void onLoad() {
         super.onLoad();
-        if (!level.isClientSide) {
+        if (level != null && !level.isClientSide) {
+            // Ensure this is initialized here (ordering-safe)
+            globalNet = GlobalWireNetwork.getNetwork(level);
+
+            // Let IE rebuild/attach this connector to the wire network
+            if (globalNet != null) {
+                ConnectorBlockEntityHelper.onChunkLoad(this, level);
+            }
+
+            // Your MI stuff is fine to run after
             this.invalidateCapabilities();
             level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
             MIPipeHook.rescanAdjacentPipes(level, worldPosition, tier);
-            ConnectorBlockEntityHelper.onChunkLoad(this, level);
         }
     }
 
@@ -175,6 +177,17 @@ public abstract class MIConnectorBlockEntityBase extends BlockEntity
         super.onChunkUnloaded();
         if (globalNet != null && level != null && !level.isClientSide) {
             ConnectorBlockEntityHelper.onChunkUnload(globalNet, this);
+        }
+        globalNet = null; // IMPORTANT: prevents setRemoved() from nuking connections on unload
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        // Only remove from the wire network when we *actually* have a live wire network attached.
+        // On chunk unload, globalNet will have been nulled above.
+        if (level != null && !level.isClientSide && globalNet != null) {
+            ConnectorBlockEntityHelper.remove(level, this);
         }
     }
 }

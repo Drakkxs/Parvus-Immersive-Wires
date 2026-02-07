@@ -6,14 +6,14 @@ import com.tom.morewires.compat.mi.MIConnectorBlockEntityBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class MIEXvConnectorBlockEntity extends MIConnectorBlockEntityBase {
-    public MIEXvConnectorBlockEntity(BlockPos pos, BlockState state) {
+public class MIEvConnectorBlockEntity extends MIConnectorBlockEntityBase {
+    public MIEvConnectorBlockEntity(BlockPos pos, BlockState state) {
         super(
-                MoreImmersiveWires.MI_EXV_WIRE.simple().CONNECTOR_ENTITY.get(),
+                MoreImmersiveWires.MI_EV_WIRE.simple().CONNECTOR_ENTITY.get(),
                 pos, state,
                 CableTier.EV,
-                MoreImmersiveWires.MI_EXV_WIRE.simple().NET_ID,
-                MoreImmersiveWires.MI_EXV_WIRE.simple().wireType
+                MoreImmersiveWires.MI_EV_WIRE.simple().NET_ID,
+                MoreImmersiveWires.MI_EV_WIRE.simple().wireType
         );
     }
 }

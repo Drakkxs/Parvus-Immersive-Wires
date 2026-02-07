@@ -11,7 +11,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 public class MIMvWireDefinition extends MIWireDefinitionBase<MIMvConnectorBlockEntity> {
 
     public MIMvWireDefinition() {
-        super("mi_mv", "Modern Medium Voltage", 0x2e2d3a);
+        super("mi_mv", "Modern Medium Voltage", 0x003260);
     }
 
     @Override

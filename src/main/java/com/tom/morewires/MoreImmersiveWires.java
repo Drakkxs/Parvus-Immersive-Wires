@@ -5,11 +5,11 @@ import com.tom.morewires.compat.ae.AEDenseWireDefinition;
 import com.tom.morewires.compat.ae.AEWireDefinition;
 import com.tom.morewires.compat.cc.CCWireDefinition;
 import com.tom.morewires.compat.id.IntegratedDynamicsWireDefinition;
-import com.tom.morewires.compat.mi.EXV.MIEXvWireDefinition;
+import com.tom.morewires.compat.mi.EXV.MIEvWireDefinition;
 import com.tom.morewires.compat.mi.HV.MIHvWireDefinition;
 import com.tom.morewires.compat.mi.LV.MILvWireDefinition;
 import com.tom.morewires.compat.mi.MV.MIMvWireDefinition;
-import com.tom.morewires.compat.mi.SCV.MISCvWireDefinition;
+import com.tom.morewires.compat.mi.SV.MISvWireDefinition;
 import com.tom.morewires.compat.rs.RSWireDefinition;
 import com.tom.morewires.compat.sfm.SFMWireDefinition;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -74,8 +74,8 @@ public class MoreImmersiveWires {
 	public static final Wire MI_LV_WIRE = new Wire(MI, () -> MILvWireDefinition::new);
 	public static final Wire MI_MV_WIRE = new Wire(MI, () -> MIMvWireDefinition::new);
 	public static final Wire MI_HV_WIRE = new Wire(MI, () -> MIHvWireDefinition::new);
-	public static final Wire MI_EXV_WIRE = new Wire(MI, () -> MIEXvWireDefinition::new);
-	public static final Wire MI_SUPERCONDUCTOR_WIRE = new Wire(MI, () -> MISCvWireDefinition::new);
+	public static final Wire MI_EV_WIRE = new Wire(MI, () -> MIEvWireDefinition::new);
+	public static final Wire MI_SV_WIRE = new Wire(MI, () -> MISvWireDefinition::new);
 
 	public static class Wire {
 		public final String modid;

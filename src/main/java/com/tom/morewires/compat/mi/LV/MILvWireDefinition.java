@@ -11,7 +11,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 public class MILvWireDefinition extends MIWireDefinitionBase<MILvConnectorBlockEntity> {
 
     public MILvWireDefinition() {
-        super("mi_lv", "Modern Low Voltage", 0x17161f);
+        super("mi_lv", "Modern Low Voltage", 0x444444);
     }
 
     @Override
