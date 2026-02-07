@@ -10,7 +10,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import com.tom.morewires.compat.mi.MILvWireDefinition;
+import com.tom.morewires.compat.mi.EXV.MIEXvWireDefinition;
+import com.tom.morewires.compat.mi.HV.MIHvWireDefinition;
+import com.tom.morewires.compat.mi.LV.MILvWireDefinition;
+import com.tom.morewires.compat.mi.MV.MIMvWireDefinition;
+import com.tom.morewires.compat.mi.SCV.MISCvWireDefinition;
 import com.tom.morewires.compat.sfm.SFMWireDefinition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,6 +83,10 @@ public class MoreImmersiveWires {
 	public static final Wire ID_WIRE = new Wire(ID, () -> IntegratedDynamicsWireDefinition::new);
 	public static final Wire SFM_WIRE = new Wire(SFM, () -> SFMWireDefinition::new);
 	public static final Wire MI_LV_WIRE = new Wire(MI, () -> MILvWireDefinition::new);
+	public static final Wire MI_MV_WIRE = new Wire(MI, () -> MIMvWireDefinition::new);
+	public static final Wire MI_HV_WIRE = new Wire(MI, () -> MIHvWireDefinition::new);
+	public static final Wire MI_EXV_WIRE = new Wire(MI, () -> MIEXvWireDefinition::new);
+	public static final Wire MI_SUPERCONDUCTOR_WIRE = new Wire(MI, () -> MISCvWireDefinition::new);
 
 	public static class Wire {
 		public final String modid;
