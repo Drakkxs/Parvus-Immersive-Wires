@@ -1,24 +1,28 @@
 package com.tom.morewires.data;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-
+import appeng.core.definitions.AEBlocks;
+import appeng.datagen.providers.tags.ConventionTags;
 import aztech.modern_industrialization.MIBlock;
+import aztech.modern_industrialization.MIBlockKeys;
 import aztech.modern_industrialization.MIItem;
+import aztech.modern_industrialization.api.energy.CableTier;
+import aztech.modern_industrialization.client.MIKeybinds;
+import blusunrize.immersiveengineering.api.IETags;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
-import org.cyclops.integrateddynamics.RegistryEntries;
-
+import com.mojang.logging.LogUtils;
+import com.tom.morewires.MoreImmersiveWires;
+import com.tom.morewires.MoreImmersiveWires.Wire;
+import com.tom.morewires.WireTypeDefinition.ConnectorInfo;
+import com.tom.morewires.WireTypeDefinition.RelayInfo;
+import com.tom.morewires.WireTypeDefinition.WireInfo;
+import com.tom.morewires.compat.cc.CCWireDefinition;
+import dan200.computercraft.shared.ModRegistry;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -28,19 +32,13 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.cyclops.integrateddynamics.RegistryEntries;
 
-import com.tom.morewires.MoreImmersiveWires;
-import com.tom.morewires.MoreImmersiveWires.Wire;
-import com.tom.morewires.WireTypeDefinition.ConnectorInfo;
-import com.tom.morewires.WireTypeDefinition.RelayInfo;
-import com.tom.morewires.WireTypeDefinition.WireInfo;
-import com.tom.morewires.compat.cc.CCWireDefinition;
-
-import dan200.computercraft.shared.ModRegistry;
-
-import appeng.core.definitions.AEBlocks;
-import appeng.datagen.providers.tags.ConventionTags;
-import blusunrize.immersiveengineering.api.IETags;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class Recipes extends RecipeProvider {
 
@@ -49,14 +47,22 @@ public class Recipes extends RecipeProvider {
 	}
 
 	public static enum WireRecipe {
+
+		// 1# Wire type, 2# Accessory for connector and relay, 3# Base for connector / relay, 4# sole resource for coil
 		AE(MoreImmersiveWires.AE_WIRE, CraftingIngredient.of(Blocks.DEEPSLATE), CraftingIngredient.of(ConventionTags.FLUIX_CRYSTAL), CraftingIngredient.of(ConventionTags.GLASS_CABLE)),
 		AE_DENSE(MoreImmersiveWires.AE_DENSE_WIRE, CraftingIngredient.of(AEBlocks.SKY_STONE_BLOCK), CraftingIngredient.of(AEBlocks.FLUIX_BLOCK), CraftingIngredient.of(ConventionTags.COVERED_DENSE_CABLE)),
 		RS(MoreImmersiveWires.RS_WIRE, CraftingIngredient.of(Tags.Items.STONES), CraftingIngredient.of(com.refinedmods.refinedstorage.common.content.Items.INSTANCE.getQuartzEnrichedCopper()), new TagIngredient(com.refinedmods.refinedstorage.common.content.Tags.CABLES)),
 		ID(MoreImmersiveWires.ID_WIRE, CraftingIngredient.of(RegistryEntries.BLOCK_MENRIL_WOOD.get()), CraftingIngredient.of("integrateddynamics:crystalized_menril_chunk"), CraftingIngredient.of(RegistryEntries.BLOCK_CABLE.get())),
 		CC(MoreImmersiveWires.CC_WIRE, CraftingIngredient.of(Tags.Items.STONES), CraftingIngredient.of(Items.REDSTONE), CraftingIngredient.of(ModRegistry.Items.CABLE.get())),
 		SFM(MoreImmersiveWires.SFM_WIRE, CraftingIngredient.of(Tags.Items.CHESTS), CraftingIngredient.of(SFMBlocks.FANCY_CABLE_BLOCK.get()), CraftingIngredient.of(SFMBlocks.CABLE_BLOCK.get())),
-		MI_LV(MoreImmersiveWires.MI_LV_WIRE, CraftingIngredient.of(Tags.Items.STONES), CraftingIngredient.of(MIBlock.BASIC_MACHINE_HULL), CraftingIngredient.of(MIItem.RUBBER_SHEET))
+		MI_LV(MoreImmersiveWires.MI_LV_WIRE, CraftingIngredient.of(MIBlock.BLOCK_FIRE_CLAY_BRICKS), CraftingIngredient.of(MIItem.CIRCUIT_BOARD), CraftingIngredient.of(MIItem.CIRCUIT_BOARD)),
+		MI_MV(MoreImmersiveWires.MI_MV_WIRE, CraftingIngredient.of(MIBlock.BLOCK_FIRE_CLAY_BRICKS), CraftingIngredient.of(MIItem.ELECTRONIC_CIRCUIT_BOARD), CraftingIngredient.of(MIItem.ELECTRONIC_CIRCUIT_BOARD)),
+		MI_HV(MoreImmersiveWires.MI_HV_WIRE, CraftingIngredient.of(MIBlock.BLOCK_FIRE_CLAY_BRICKS), CraftingIngredient.of(MIItem.DIGITAL_CIRCUIT_BOARD), CraftingIngredient.of(MIItem.DIGITAL_CIRCUIT_BOARD)),
+		MI_EV(MoreImmersiveWires.MI_EV_WIRE, CraftingIngredient.of(MIBlock.BLOCK_FIRE_CLAY_BRICKS), CraftingIngredient.of(MIItem.PROCESSING_UNIT_BOARD), CraftingIngredient.of(MIItem.PROCESSING_UNIT_BOARD)),
+		MI_SV(MoreImmersiveWires.MI_SV_WIRE, CraftingIngredient.of(MIBlock.BLOCK_FIRE_CLAY_BRICKS), CraftingIngredient.of(MIItem.QUANTUM_CIRCUIT_BOARD), CraftingIngredient.of(MIItem.QUANTUM_CIRCUIT_BOARD))
 		;
+
+
 		public final WireInfo[] wire;
 		public final ConnectorInfo[] connector;
 		public final RelayInfo[] relay;
@@ -147,7 +153,9 @@ public class Recipes extends RecipeProvider {
 	@Override
 	protected void buildRecipes(RecipeOutput consumer) {
 		for (WireRecipe wr : WireRecipe.values()) {
+
 			ConditionalRecipeUtil.builder().addCondition(new ModLoadedCondition(wr.modid)).addRecipe(cc -> {
+
 				for (int i = 0; i < wr.wire.length; i++) {
 					WireInfo w = wr.wire[i];
 					ShapedRecipeBuilderEx.shaped(w.getCoilItem().get(), 4)

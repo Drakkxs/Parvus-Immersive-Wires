@@ -1,0 +1,41 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "modern_industrialization"
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "more_immersive_wires:mi_ev_relay"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "mi_ev_relay_unlock": {
+      "conditions": {
+        "items": [
+          {
+            "items": "modern_industrialization:fire_clay_bricks"
+          },
+          {
+            "items": "modern_industrialization:processing_unit_board"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "mi_ev_relay_unlock"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "more_immersive_wires:mi_ev_relay"
+    ]
+  }
+}

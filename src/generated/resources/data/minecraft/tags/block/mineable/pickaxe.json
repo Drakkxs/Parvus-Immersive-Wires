@@ -57,6 +57,38 @@
       "required": false
     },
     {
+      "id": "more_immersive_wires:mi_mv_connector",
+      "required": false
+    },
+    {
+      "id": "more_immersive_wires:mi_mv_relay",
+      "required": false
+    },
+    {
+      "id": "more_immersive_wires:mi_hv_connector",
+      "required": false
+    },
+    {
+      "id": "more_immersive_wires:mi_hv_relay",
+      "required": false
+    },
+    {
+      "id": "more_immersive_wires:mi_ev_connector",
+      "required": false
+    },
+    {
+      "id": "more_immersive_wires:mi_ev_relay",
+      "required": false
+    },
+    {
+      "id": "more_immersive_wires:mi_sv_connector",
+      "required": false
+    },
+    {
+      "id": "more_immersive_wires:mi_sv_relay",
+      "required": false
+    },
+    {
       "id": "more_immersive_wires:cc_modem",
       "required": false
     }

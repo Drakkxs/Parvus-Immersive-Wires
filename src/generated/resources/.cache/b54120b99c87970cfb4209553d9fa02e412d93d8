@@ -1,4 +1,4 @@
-// 1.21.1	2026-02-03T05:06:42.3794086	Item Models 2
+// 1.21.1	2026-02-06T21:57:50.3582019	Item Models 2
 55b22639e197a34b13c32fa21be48c43761bcb42 assets/more_immersive_wires/models/item/ae_connector.json
 a1653ede68f8ab4b5ce7cf0ba86c951123ff33c2 assets/more_immersive_wires/models/item/ae_dense_relay.json
 b29c968c74ef016369da9a34e7ad313d445cb0c0 assets/more_immersive_wires/models/item/ae_relay.json
@@ -6,8 +6,16 @@ d4dffec056a22ccf3ab7d103dadee78ff3c3953e assets/more_immersive_wires/models/item
 3e0e6214dacc4161b2c43cd4d11e128998fca81e assets/more_immersive_wires/models/item/cc_relay.json
 b3bdf460f2b682738e1d730528adbaa11e7c0fb6 assets/more_immersive_wires/models/item/id_connector.json
 f6f0fb2b9dde3d852667ad4092aa2227d6409086 assets/more_immersive_wires/models/item/id_relay.json
+267e71a64ed3e46f7597fb04fdf21f33f12fcc49 assets/more_immersive_wires/models/item/mi_ev_connector.json
+8c99184c580e6f6cac7efe3e17edc43a380d606c assets/more_immersive_wires/models/item/mi_ev_relay.json
+837e5aaa8d5a3d64ec26540456d41c8d10f921a4 assets/more_immersive_wires/models/item/mi_hv_connector.json
+9f72231b96ef3f12d4cd7d4e7bdfae8c63801d59 assets/more_immersive_wires/models/item/mi_hv_relay.json
 2191d8e4b4cc5e560c6e5fc3b037b366762bb9a3 assets/more_immersive_wires/models/item/mi_lv_connector.json
 40420bde5aab9e8148717436b51964337a1c84fe assets/more_immersive_wires/models/item/mi_lv_relay.json
+b4e7bc04a9a55024b0f05a429cbedf2dc2c9ee82 assets/more_immersive_wires/models/item/mi_mv_connector.json
+1c257bae3d118c2ac2a8748899f81066f24ab86b assets/more_immersive_wires/models/item/mi_mv_relay.json
+61b59eff63fa2a542f397747c72b75e7dd3ad874 assets/more_immersive_wires/models/item/mi_sv_connector.json
+3781acef9fd3c1283fbf042ac299704173eeb344 assets/more_immersive_wires/models/item/mi_sv_relay.json
 0a783a0e44b9c0fd461e8895b18d598a6785628e assets/more_immersive_wires/models/item/rs_connector.json
 914f6e8f181cfd330a1800fff1c57e48b39a1c17 assets/more_immersive_wires/models/item/rs_relay.json
 39deb556dad711e7275aecefec64f803596d9e01 assets/more_immersive_wires/models/item/sfm_connector.json
