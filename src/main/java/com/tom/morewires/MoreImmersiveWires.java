@@ -1,32 +1,21 @@
 package com.tom.morewires;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
+import com.tom.morewires.WireTypeDefinition.RelayInfo;
+import com.tom.morewires.compat.ae.AEDenseWireDefinition;
+import com.tom.morewires.compat.ae.AEWireDefinition;
+import com.tom.morewires.compat.cc.CCWireDefinition;
+import com.tom.morewires.compat.id.IntegratedDynamicsWireDefinition;
 import com.tom.morewires.compat.mi.EXV.MIEXvWireDefinition;
 import com.tom.morewires.compat.mi.HV.MIHvWireDefinition;
 import com.tom.morewires.compat.mi.LV.MILvWireDefinition;
 import com.tom.morewires.compat.mi.MV.MIMvWireDefinition;
 import com.tom.morewires.compat.mi.SCV.MISCvWireDefinition;
+import com.tom.morewires.compat.rs.RSWireDefinition;
 import com.tom.morewires.compat.sfm.SFMWireDefinition;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -46,13 +35,13 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforgespi.language.IModInfo;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import com.tom.morewires.WireTypeDefinition.RelayInfo;
-import com.tom.morewires.compat.ae.AEDenseWireDefinition;
-import com.tom.morewires.compat.ae.AEWireDefinition;
-import com.tom.morewires.compat.cc.CCWireDefinition;
-import com.tom.morewires.compat.id.IntegratedDynamicsWireDefinition;
-import com.tom.morewires.compat.rs.RSWireDefinition;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(MoreImmersiveWires.modid)
